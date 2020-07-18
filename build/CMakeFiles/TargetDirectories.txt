@@ -1,0 +1,8 @@
+/home/jason-1/Desktop/WebServer/build/CMakeFiles/rebuild_cache.dir
+/home/jason-1/Desktop/WebServer/build/CMakeFiles/edit_cache.dir
+/home/jason-1/Desktop/WebServer/build/base/CMakeFiles/rebuild_cache.dir
+/home/jason-1/Desktop/WebServer/build/base/CMakeFiles/libserver_base.dir
+/home/jason-1/Desktop/WebServer/build/base/CMakeFiles/edit_cache.dir
+/home/jason-1/Desktop/WebServer/build/base/tests/CMakeFiles/rebuild_cache.dir
+/home/jason-1/Desktop/WebServer/build/base/tests/CMakeFiles/Thread_test.dir
+/home/jason-1/Desktop/WebServer/build/base/tests/CMakeFiles/edit_cache.dir
