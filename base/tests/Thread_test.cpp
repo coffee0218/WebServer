@@ -86,4 +86,5 @@ int main()
     // t6 destruct later than thread creation.
   }
   sleep(2);
+  printf("number of created threads %d\n", Thread::numCreated());
 }

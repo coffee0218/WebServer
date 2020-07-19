@@ -5,8 +5,10 @@
 #include <functional>
 #include <memory>
 #include <string>
+
 #include "CountDownLatch.h"
 #include "noncopyable.h"
+#include "Atomic.h"
 
 class Thread : noncopyable {
  public:
@@ -19,6 +21,8 @@ class Thread : noncopyable {
   pid_t tid() const { return tid_; }
   const std::string& name() const { return name_; }
 
+  static int numCreated() { return numCreated_.get(); }
+
  private:
   void setDefaultName();
   bool started_;
@@ -28,4 +32,6 @@ class Thread : noncopyable {
   ThreadFunc func_;
   std::string name_;
   CountDownLatch latch_;
+
+  static AtomicInt32 numCreated_;
 };

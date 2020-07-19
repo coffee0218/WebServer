@@ -1,4 +1,5 @@
 #include "AsyncLogging.h"
+#include "Timestamp.h"
 #include <assert.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -72,12 +73,12 @@ void AsyncLogging::threadFunc() {//后端接收日志
     assert(!buffersToWrite.empty());
 
     if (buffersToWrite.size() > 25) {//处理过多的日志堆积问题，直接丢弃
-     /* char buf[256];
+      char buf[256];
       snprintf(buf, sizeof buf, "Dropped log messages at %s, %zd larger buffers\n",
                 Timestamp::now().toFormattedString().c_str(),
                 buffersToWrite.size()-2);
       fputs(buf, stderr);
-      output.append(buf, static_cast<int>(strlen(buf)));*/
+      output.append(buf, static_cast<int>(strlen(buf)));
       buffersToWrite.erase(buffersToWrite.begin() + 2, buffersToWrite.end());
     }
 

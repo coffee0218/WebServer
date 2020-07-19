@@ -15,10 +15,10 @@
 using namespace std;
 
 namespace CurrentThread {
-__thread int t_cachedTid = 0;
-__thread char t_tidString[32];
-__thread int t_tidStringLength = 6;
-__thread const char* t_threadName = "default";
+  __thread int t_cachedTid = 0;
+  __thread char t_tidString[32];
+  __thread int t_tidStringLength = 6;
+  __thread const char* t_threadName = "default";
 }
 
 pid_t gettid() { return static_cast<pid_t>(::syscall(SYS_gettid)); }
@@ -64,6 +64,8 @@ void* startThread(void* obj) {
   return NULL;
 }
 
+AtomicInt32 Thread::numCreated_;
+
 Thread::Thread(const ThreadFunc& func, const string& n)
     : started_(false),
       joined_(false),
@@ -80,9 +82,10 @@ Thread::~Thread() {
 }
 
 void Thread::setDefaultName() {
+  int num = numCreated_.incrementAndGet();
   if (name_.empty()) {
     char buf[32];
-    snprintf(buf, sizeof buf, "Thread");
+    snprintf(buf, sizeof buf, "Thread%d", num);
     name_ = buf;
   }
 }
