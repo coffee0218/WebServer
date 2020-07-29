@@ -37,6 +37,7 @@ void EventLoop::loop()
   ::poll(NULL, 0, 5*1000);
 
   //LOG << "EventLoop " << this << " stop looping";
+  LOG << "EventLoop " << " stop looping";
   looping_ = false;
 }
 
@@ -45,5 +46,6 @@ void EventLoop::abortNotInLoopThread()
   /*LOG << "EventLoop::abortNotInLoopThread - EventLoop " << this
             << " was created in threadId_ = " << threadId_
             << ", current thread id = " <<  CurrentThread::tid();*/
+  LOG << "abcd";
 }
 
