@@ -1,6 +1,7 @@
 set(LIB_SRC
     AsyncLogging.cpp
     CountDownLatch.cpp
+    Condition.cpp
     FileUtil.cpp
     LogFile.cpp
     Logging.cpp
@@ -13,6 +14,6 @@ set(LIB_SRC
 add_library(libserver_base ${LIB_SRC})
 target_link_libraries(libserver_base pthread rt)
 set_target_properties(libserver_base PROPERTIES OUTPUT_NAME "server_base")
-set (LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
+set (LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/build/lib)
 
 

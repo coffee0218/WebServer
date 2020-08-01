@@ -8,8 +8,6 @@ add_compile_options(-std=c++11 -Wall -g)
 include_directories(${PROJECT_SOURCE_DIR}/base)
 include_directories(${PROJECT_SOURCE_DIR}/reactor)
 
-link_directories (${PROJECT_SOURCE_DIR}/lib)
-
 add_subdirectory (base)
 add_subdirectory (reactor)
 

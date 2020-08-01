@@ -1,29 +1,29 @@
 #pragma once
-#include <pthread.h>
-#include <cstdio>
-#include "noncopyable.h"
-#include "CurrentThread.h"
-#include <assert.h>
-#include <stdlib.h>
 
-/* 由于pthread系列函数返回成功的时候都是0，因此，
-我们可以写一个宏作为一个轻量级的检查手段，来判断处理错误。*/
+#include "CurrentThread.h"
+#include "noncopyable.h"
+#include <assert.h>
+#include <pthread.h>
+#include <stdlib.h>
+#include <cstdio>
 
 #define MCHECK(exp) \
     if(exp) \
     { \
         fprintf(stderr, "File:%s, Line:%d Exp:[" #exp "] is true, abort.\n",__FILE__, __LINE__); abort();\
     }
-
-class MutexLock : noncopyable {
+  
+class MutexLock : noncopyable
+{
  public:
-  MutexLock() 
+  MutexLock()
     : holder_(0)
-  { 
-    MCHECK(pthread_mutex_init(&mutex_, NULL)); 
+  {
+    MCHECK(pthread_mutex_init(&mutex_, NULL));
   }
 
-  ~MutexLock() {
+  ~MutexLock()
+  {
     assert(holder_ == 0);
     MCHECK(pthread_mutex_destroy(&mutex_));
   }
@@ -39,16 +39,18 @@ class MutexLock : noncopyable {
     assert(isLockedByThisThread());
   }
 
-  void lock() 
-  { 
+  // internal usage
+
+  void lock()
+  {
     MCHECK(pthread_mutex_lock(&mutex_));
-    assignHolder(); 
+    assignHolder();
   }
 
-  void unlock() 
-  { 
+  void unlock()
+  {
     unassignHolder();
-    MCHECK(pthread_mutex_unlock(&mutex_)); 
+    MCHECK(pthread_mutex_unlock(&mutex_));
   }
 
   pthread_mutex_t* getPthreadMutex() /* non-const */
@@ -57,8 +59,25 @@ class MutexLock : noncopyable {
   }
 
  private:
-  pthread_mutex_t mutex_;
-  pid_t holder_;
+  friend class Condition;
+
+  class UnassignGuard : noncopyable
+  {
+   public:
+    explicit UnassignGuard(MutexLock& owner)
+      : owner_(owner)
+    {
+      owner_.unassignHolder();
+    }
+
+    ~UnassignGuard()
+    {
+      owner_.assignHolder();
+    }
+
+   private:
+    MutexLock& owner_;
+  };
 
   void unassignHolder()
   {
@@ -69,25 +88,40 @@ class MutexLock : noncopyable {
   {
     holder_ = CurrentThread::tid();
   }
-  
-  friend class Condition;// 友元类不受访问权限影响
+
+  pthread_mutex_t mutex_;
+  pid_t holder_;
 };
 
-//使用RAII（资源获取即初始化）技术，对MutexLock初始化和析构进行处理。
-//初始化的时候加锁，析构的时候解锁
-class MutexLockGuard : noncopyable {
+// Use as a stack variable, eg.
+// int Foo::size() const
+// {
+//   MutexLockGuard lock(mutex_);
+//   return data_.size();
+// }
+class MutexLockGuard : noncopyable
+{
  public:
-  explicit MutexLockGuard(MutexLock &_mutex) 
-  : mutex(_mutex) 
-  { 
-    mutex.lock(); 
+  explicit MutexLockGuard(MutexLock& mutex)
+    : mutex_(mutex)
+  {
+    mutex_.lock();
   }
 
-  ~MutexLockGuard() 
-  { 
-    mutex.unlock();
+  ~MutexLockGuard()
+  {
+    mutex_.unlock();
   }
 
  private:
-  MutexLock &mutex;
+
+  MutexLock& mutex_;
 };
+
+
+// Prevent misuse like:
+// MutexLockGuard(mutex_);
+// A tempory object doesn't hold the lock for long!
+#define MutexLockGuard(x) error "Missing guard object name"
+
+

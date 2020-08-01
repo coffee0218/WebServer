@@ -81,7 +81,7 @@ void ThreadPool::run(Task task)
   }
 }
 
-ThreadPool::Task ThreadPool::take()
+ThreadPool::Task ThreadPool:: take()
 {
   MutexLockGuard lock(mutex_);
   // always use a while-loop, due to spurious wakeup
@@ -102,7 +102,7 @@ ThreadPool::Task ThreadPool::take()
   return task;
 }
 
-bool ThreadPool::isFull() const
+bool ThreadPool:: isFull() const
 {
   mutex_.assertLocked();
   return maxQueueSize_ > 0 && queue_.size() >= maxQueueSize_;
