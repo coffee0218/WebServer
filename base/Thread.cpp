@@ -64,14 +64,14 @@ void* startThread(void* obj) {
   return NULL;
 }
 
-AtomicInt32 Thread::numCreated_;
+AtomicInt32 Thread::numCreated_;//原子操作数numCreated_,计算线程的创建数量
 
 Thread::Thread(const ThreadFunc& func, const string& n)
     : started_(false),
       joined_(false),
       pthreadId_(0),
       tid_(0),
-      func_(func),
+      func_(func),//注册回调函数func到func_
       name_(n),
       latch_(1) {
   setDefaultName();
@@ -90,7 +90,7 @@ void Thread::setDefaultName() {
   }
 }
 
-void Thread::start() {
+void Thread::start() {//start创建一个线程，并且在线程里调用回调函数func_
   assert(!started_);
   started_ = true;
   ThreadData* data = new ThreadData(func_, name_, &tid_, &latch_);

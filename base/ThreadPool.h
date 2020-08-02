@@ -13,13 +13,13 @@ using namespace std;
 class ThreadPool : noncopyable
 {
  public:
-  typedef std::function<void ()> Task;
+  typedef std::function<void ()> Task;//我们使用了function，作为任务队列的任务元素
 
   explicit ThreadPool(const string& nameArg = string("ThreadPool"));
   ~ThreadPool();
 
   // Must be called before start().
-  void setMaxQueueSize(int maxSize) { maxQueueSize_ = maxSize; }
+  void setMaxQueueSize(int maxSize) { maxQueueSize_ = maxSize; }//设置任务队列的大小
   void setThreadInitCallback(const Task& cb)
   { threadInitCallback_ = cb; }
 
@@ -43,7 +43,7 @@ class ThreadPool : noncopyable
   void runInThread();
   Task take();
 
-  mutable MutexLock mutex_;
+  mutable MutexLock mutex_;//ThreadPool需要一把互斥锁和两个同步变量，实现同步与互斥
   Condition notEmpty_ ;
   Condition notFull_ ;
   string name_;
@@ -51,7 +51,7 @@ class ThreadPool : noncopyable
   std::vector<std::unique_ptr<Thread>> threads_;
   std::deque<Task> queue_ ;
   size_t maxQueueSize_;
-  bool running_;
+  bool running_;//判断线程池是否在工作
 };
 
 

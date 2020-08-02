@@ -31,8 +31,8 @@ void ThreadPool::start(int numThreads)
     char id[32];
     snprintf(id, sizeof id, "%d", i+1);
     threads_.emplace_back(new Thread(
-          std::bind(&ThreadPool::runInThread, this), name_+id));
-    threads_[i]->start();
+          std::bind(&ThreadPool::runInThread, this), name_+id));//将runInThread绑定到thread，注册回调函数
+    threads_[i]->start();//启动线程，调用回调函数runInThread，也就是处理task
   }
   if (numThreads == 0 && threadInitCallback_)
   {
@@ -40,17 +40,22 @@ void ThreadPool::start(int numThreads)
   }
 }
 
+/*
+ * stop 线程池过程
+ * 先将running_设置为false，然后调用notifyAll，激活所有等待的线程,
+ * 关闭所有的条件等待,线程退出.
+ */
 void ThreadPool::stop()
 {
   {
   MutexLockGuard lock(mutex_);
   running_ = false;
-  notEmpty_.notifyAll();
+  notEmpty_.notifyAll();////激活所有的线程
   notFull_.notifyAll();
   }
   for (auto& thr : threads_)
   {
-    thr->join();
+    thr->join();//回收停止运行的线程
   }
 }
 
@@ -60,7 +65,7 @@ size_t ThreadPool::queueSize() const
   return queue_.size();
 }
 
-void ThreadPool::run(Task task)
+void ThreadPool::run(Task task)//添加任务
 {
   if (threads_.empty())
   {
@@ -73,7 +78,8 @@ void ThreadPool::run(Task task)
     {
       notFull_.wait();
     }
-    if (!running_) return;
+    if (!running_) return;//这里注意，退出while循环后，需要再判断一次bool变量，
+    //因为未必是条件满足了，可能是线程池需要退出，调整了running_变量
     assert(!isFull());
 
     queue_.push_back(std::move(task));
@@ -81,7 +87,7 @@ void ThreadPool::run(Task task)
   }
 }
 
-ThreadPool::Task ThreadPool:: take()
+ThreadPool::Task ThreadPool:: take()//取走任务
 {
   MutexLockGuard lock(mutex_);
   // always use a while-loop, due to spurious wakeup
@@ -108,7 +114,7 @@ bool ThreadPool:: isFull() const
   return maxQueueSize_ > 0 && queue_.size() >= maxQueueSize_;
 }
 
-void ThreadPool::runInThread()
+void ThreadPool::runInThread()//注册在Thread的回调函数，作用是从queue中take task
 {
   try
   {
@@ -118,7 +124,7 @@ void ThreadPool::runInThread()
     }
     while (running_)
     {
-      Task task(take());
+      Task task(take());//阻塞直到有task添加到队列
       if (task)
       {
         task();

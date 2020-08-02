@@ -74,7 +74,7 @@ class AtomicIntegerT : noncopyable
   }
 
  private:
-  volatile T value_;
+  volatile T value_;//多线程应用中被多个任务共享的变量，被定义为volatile
 };
 
 typedef AtomicIntegerT<int32_t> AtomicInt32;

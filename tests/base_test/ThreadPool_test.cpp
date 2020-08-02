@@ -35,7 +35,7 @@ void test(int maxSize)
   }
   LOG << "Done";
 
-  CountDownLatch latch(1);
+  CountDownLatch latch(1);//使用countDown，主线程等待子线程都执行完任务再执行stop操作
   pool.run(std::bind(&CountDownLatch::countDown, &latch));
   latch.wait();
   pool.stop();

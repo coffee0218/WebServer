@@ -93,12 +93,10 @@ class MutexLock : noncopyable
   pid_t holder_;
 };
 
-// Use as a stack variable, eg.
-// int Foo::size() const
-// {
-//   MutexLockGuard lock(mutex_);
-//   return data_.size();
-// }
+/*
+ *使用RAII（资源获取即初始化）技术，对MutexLock初始化和析构进行处理。
+ *初始化的时候加锁，析构的时候解锁
+*/
 class MutexLockGuard : noncopyable
 {
  public:
@@ -117,7 +115,6 @@ class MutexLockGuard : noncopyable
 
   MutexLock& mutex_;
 };
-
 
 // Prevent misuse like:
 // MutexLockGuard(mutex_);
