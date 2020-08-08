@@ -1,5 +1,5 @@
 #include "../base/Logging.h"
-#include "Poller.h"
+#include "EventLoop.h"
 #include <assert.h>
 #include <poll.h>
 
@@ -8,7 +8,8 @@ using namespace std;
 *Poller是EventLoop的间接成员，只供其onwer EventLoop在IO线程调用，
 *因此无需加锁，其生命周期和eventLoop相等
 */
-Poller::Poller()
+Poller::Poller(EventLoop* loop)
+  : ownerLoop_(loop)
 {
 }
 
@@ -16,6 +17,10 @@ Poller::~Poller()
 {
 }
 
+void Poller::assertInLoopThread()
+{ 
+    ownerLoop_->assertInLoopThread(); 
+}
 //获得当前活动的IO事件，然后填充调用方法传入的activeChannels
 Timestamp Poller::poll(int timeoutMs, ChannelList* activeChannels)
 {
@@ -59,11 +64,11 @@ void Poller::fillActiveChannels(int numEvents,
 }
 
 /*Poller::updateChannel()的主要功能是负责维护和更新pollfds_数组，
-*添加新channel的复杂度是O(NlogN),更新已有的channel的复杂度为O（1）
+*添加新channel的复杂度是O(NlogN),更新已有的channel的复杂度为O(1)
 */
 void Poller::updateChannel(Channel* channel)
 {
-  //assertInLoopThread();
+  assertInLoopThread();
   LOG << "fd = " << channel->fd() << " events = " << channel->events();
   if (channel->index() < 0) {
     // a new one, add to pollfds_

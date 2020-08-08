@@ -2,6 +2,8 @@ set(LIB_SRC
     Channel.cpp
     EventLoop.cpp
     Poller.cpp
+    Timer.cpp
+    TimerQueue.cpp
 )
 
 add_library(libserver_reactor ${LIB_SRC})

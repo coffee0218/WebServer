@@ -4,8 +4,9 @@
 #include <map>
 #include <vector>
 #include "../base/Timestamp.h"
-#include "Channel.h"
-//#include "EventLoop.h"
+
+class channel;
+class EventLoop;
 
 struct pollfd;
 
@@ -18,7 +19,7 @@ class Poller : boost::noncopyable
  public:
   typedef std::vector<Channel*> ChannelList;
 
-  Poller();
+  Poller(EventLoop* loop);
   ~Poller();//析构简单，因为它的成员变量都是标准库容器
 
   /// Polls the I/O events.
@@ -29,10 +30,7 @@ class Poller : boost::noncopyable
   /// Must be called in the loop thread.
   void updateChannel(Channel* channel);
 
-  /*void assertInLoopThread()
-  { 
-    ownerLoop_->assertInLoopThread(); 
-  }*/
+  void assertInLoopThread();
 
  private:
   void fillActiveChannels(int numEvents,
@@ -41,7 +39,7 @@ class Poller : boost::noncopyable
   typedef std::vector<struct pollfd> PollFdList;
   typedef std::map<int, Channel*> ChannelMap;
 
-  //EventLoop* ownerLoop_;
+  EventLoop* ownerLoop_;
   PollFdList pollfds_;//pollfd数组
   ChannelMap channels_;
 };
