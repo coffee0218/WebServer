@@ -102,6 +102,7 @@ void EventLoop::loop()
   looping_ = false;
 }
 
+//quit必要时唤醒IO线程，让它终止循环
 void EventLoop::quit()
 {
   quit_ = true;
@@ -111,6 +112,11 @@ void EventLoop::quit()
   }
 }
 
+/*
+*如果用户是在当前IO线程调用这个函数，回调会同步进行；
+*如果用户在其他吸纳从调用runInLoop(), cb会被加入队列，
+*IO线程会被唤醒来调用这个Functor
+*/
 void EventLoop::runInLoop(const Functor& cb)
 {
   if (isInLoopThread())
@@ -123,16 +129,23 @@ void EventLoop::runInLoop(const Functor& cb)
   }
 }
 
+/*
+*由于IO线程平时阻塞在事件循环loop()的poll调用中，为了让IO线程能够立刻执行用户回调，
+*我们需要设法唤醒它，queueInLoop将cb放入队列，并在必要时调用wakeup唤醒IO线程。
+*必要时有两种情况：如果调用的不是IO线程，必须唤醒。
+*如果在IO线程调用queueInLoop(),而此时正在调用pending functor, 也必须唤醒。
+*只有在IO线程的回调事件回调中调用queueInLoop()才无需wakeup().
+*/
 void EventLoop::queueInLoop(const Functor& cb)
 {
   {
-  MutexLockGuard lock(mutex_);
-  pendingFunctors_.push_back(cb);
+    MutexLockGuard lock(mutex_);
+    pendingFunctors_.push_back(cb);
   }
 
   if (!isInLoopThread() || callingPendingFunctors_)
   {
-    wakeup();
+    wakeup();//向wakeupFd_写数据，唤醒它的读事件
   }
 }
 
@@ -156,7 +169,7 @@ void EventLoop::wakeup()
   ssize_t n = ::write(wakeupFd_, &one, sizeof one);
   if (n != sizeof one)
   {
-    LOG_ERROR << "EventLoop::wakeup() writes " << n << " bytes instead of 8";
+    LOG<< "error: EventLoop::wakeup() writes " << n << " bytes instead of 8";
   }
 }
 
@@ -166,18 +179,22 @@ void EventLoop::handleRead()
   ssize_t n = ::read(wakeupFd_, &one, sizeof one);
   if (n != sizeof one)
   {
-    LOG_ERROR << "EventLoop::handleRead() reads " << n << " bytes instead of 8";
+    LOG << "error: EventLoop::handleRead() reads " << n << " bytes instead of 8";
   }
 }
 
+/*
+*doPendingFunctors()把回调列表swap()到局部变量functors中，这样一方面减小了临界区长度
+*(不会阻塞其他线程调用queueInLoop()),另一方面也避免了死锁(因为Functor可能会再调用queueInLoop())
+*/
 void EventLoop::doPendingFunctors()
 {
   std::vector<Functor> functors;
   callingPendingFunctors_ = true;
 
   {
-  MutexLockGuard lock(mutex_);
-  functors.swap(pendingFunctors_);
+    MutexLockGuard lock(mutex_);
+    functors.swap(pendingFunctors_);
   }
 
   for (size_t i = 0; i < functors.size(); ++i)
