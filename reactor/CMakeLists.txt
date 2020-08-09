@@ -1,6 +1,7 @@
 set(LIB_SRC
     Channel.cpp
     EventLoop.cpp
+    EventLoopThread.cpp
     Poller.cpp
     Timer.cpp
     TimerQueue.cpp

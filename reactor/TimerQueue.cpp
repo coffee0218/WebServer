@@ -89,11 +89,24 @@ TimerQueue::~TimerQueue()
   }
 }
 
+/*
+*将addTimer拆分成两部分，借用EventLoop::runInLoop(),我们可以轻易地将addTimer()
+*做成线程安全地。拆分后的addTimer()调用runInLoop()，只负责转发
+*实际工作转移到IO线程，addTimerInLoop完成修改定时器列表地工作
+*这样无论在哪个线程调用addTimer都是安全的
+*/
 TimerId TimerQueue::addTimer(const TimerCallback& cb,
                              Timestamp when,
                              double interval)
 {
   Timer* timer = new Timer(cb, when, interval);
+  loop_->runInLoop(
+      boost::bind(&TimerQueue::addTimerInLoop, this, timer));
+  return TimerId(timer);
+}
+
+void TimerQueue::addTimerInLoop(Timer* timer)
+{
   loop_->assertInLoopThread();
   bool earliestChanged = insert(timer);
 
@@ -101,7 +114,6 @@ TimerId TimerQueue::addTimer(const TimerCallback& cb,
   {
     resetTimerfd(timerfd_, timer->expiration());
   }
-  return TimerId(timer);
 }
 
 void TimerQueue::handleRead()

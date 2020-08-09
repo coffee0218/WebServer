@@ -13,4 +13,7 @@ target_link_libraries(EventLoop_test4 libserver_reactor)
 add_executable(EventLoop_test5 EventLoop_test5.cpp)
 target_link_libraries(EventLoop_test5 libserver_reactor)
 
+add_executable(EventLoop_test6 EventLoop_test6.cpp)
+target_link_libraries(EventLoop_test6 libserver_reactor)
+
 set (EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/build/bin)

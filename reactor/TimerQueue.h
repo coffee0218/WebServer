@@ -37,6 +37,7 @@ class TimerQueue : boost::noncopyable
   typedef std::pair<Timestamp, Timer*> Entry;
   typedef std::set<Entry> TimerList;//TimerList是set而非map，因为只有key没有value
 
+  void addTimerInLoop(Timer* timer);
   void handleRead();// 定时器到期，timerfd_上有可读事件事件时被调用
   
   std::vector<Entry> getExpired(Timestamp now);// move out all expired timers
