@@ -19,4 +19,7 @@ target_link_libraries(EventLoop_test6 libserver_reactor)
 add_executable(Acceptor_test Acceptor_test.cpp)
 target_link_libraries(Acceptor_test libserver_reactor)
 
+add_executable(TcpConnection_test TcpConnection_test.cpp)
+target_link_libraries(TcpConnection_test libserver_reactor)
+
 set (EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/build/bin)

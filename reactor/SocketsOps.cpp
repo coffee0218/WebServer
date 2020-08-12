@@ -134,3 +134,17 @@ void sockets::fromHostPort(const char* ip, uint16_t port,
   }
 }
 
+/*
+* getsockname()函数用于获取一个套接字的名字。
+*/
+struct sockaddr_in sockets::getLocalAddr(int sockfd)
+{
+  struct sockaddr_in localaddr;
+  bzero(&localaddr, sizeof localaddr);
+  socklen_t addrlen = sizeof(localaddr);
+  if (::getsockname(sockfd, (struct sockaddr *)(&localaddr), &addrlen) < 0)
+  {
+    LOG << "system error: sockets::getLocalAddr";
+  }
+  return localaddr;
+}

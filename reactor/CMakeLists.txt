@@ -7,6 +7,8 @@ set(LIB_SRC
     Poller.cpp
     Socket.cpp
     SocketsOps.cpp
+    TcpConnection.cpp
+    TcpServer.cpp
     Timer.cpp
     TimerQueue.cpp
 )
