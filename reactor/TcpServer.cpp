@@ -64,6 +64,23 @@ void TcpServer::newConnection(int sockfd, const InetAddress& peerAddr)
   connections_[connName] = conn;//每个TcpConnection对象有一个名字，这个名字是由其所属的TcpServer在创建TcpConnection对象时生成，名字是ConnectionMap的key。
   conn->setConnectionCallback(connectionCallback_);
   conn->setMessageCallback(messageCallback_);
+  conn->setCloseCallback(
+      boost::bind(&TcpServer::removeConnection, this, _1));//TcpServer向TcpConnection注册CloseCallback，用于接收连接断开的消息
   conn->connectEstablished();
 }
 
+/*
+*TcpServer::removeConnection把conn从ConnectionMap中移除。这时TcpConnection已经是命悬一线：
+*如果用户不持有TcpConnectionPtr的话，conn的引用计数已降到1。注意这里一定要用EventLoop::queueInLoop()，否则会出现生命管理问题。
+*另外注意这里用boost::bind让TcpConnection的生命期延长到connectDestoryed()的时刻
+*/
+void TcpServer::removeConnection(const TcpConnectionPtr& conn)
+{
+  loop_->assertInLoopThread();
+  LOG << "info: TcpServer::removeConnection [" << name_
+           << "] - connection " << conn->name();
+  size_t n = connections_.erase(conn->name());
+  assert(n == 1); (void)n;
+  loop_->queueInLoop(
+      boost::bind(&TcpConnection::connectDestroyed, conn));
+}

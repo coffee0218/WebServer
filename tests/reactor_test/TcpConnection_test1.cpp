@@ -37,7 +37,7 @@ int main()
   EventLoop loop;
 
   TcpServer server(&loop, listenAddr);
-  server.setConnectioanCallback(onConnection);
+  server.setConnectionCallback(onConnection);
   server.setMessageCallback(onMessage);
   server.start();
 

@@ -1,5 +1,4 @@
-#ifndef CHANNEL_H
-#define CHANNEL_H
+#pragma once
 
 #include <boost/function.hpp>
 #include <boost/noncopyable.hpp>
@@ -17,6 +16,7 @@ class Channel : boost::noncopyable
   typedef boost::function<void()> EventCallback;//回调函数类型
 
   Channel(EventLoop* loop, int fd);
+  ~Channel();
 
   void handleEvent();
   void setReadCallback(const EventCallback& cb)//设置读写错误回调函数
@@ -25,6 +25,8 @@ class Channel : boost::noncopyable
   { writeCallback_ = cb; }
   void setErrorCallback(const EventCallback& cb)
   { errorCallback_ = cb; }
+  void setCloseCallback(const EventCallback& cb)
+  { closeCallback_ = cb; }
 
   int fd() const { return fd_; }
   int events() const { return events_; }
@@ -34,7 +36,7 @@ class Channel : boost::noncopyable
   void enableReading() { events_ |= kReadEvent; update(); }
   // void enableWriting() { events_ |= kWriteEvent; update(); }
   // void disableWriting() { events_ &= ~kWriteEvent; update(); }
-  // void disableAll() { events_ = kNoneEvent; update(); }
+  void disableAll() { events_ = kNoneEvent; update(); }
 
   // for Poller
   int index() { return index_; }
@@ -55,8 +57,10 @@ class Channel : boost::noncopyable
   int        revents_;//revents_是目前的活动事件，由EventLoop/Poller设置
   int        index_; // used by Poller.
 
+  bool eventHandling_;
+
   EventCallback readCallback_;
   EventCallback writeCallback_;
   EventCallback errorCallback_;
+  EventCallback closeCallback_;
 };
-#endif

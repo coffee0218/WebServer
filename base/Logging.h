@@ -31,4 +31,5 @@ class Logger {
   static std::string logFileName_;
 };
 
+const char* strerror_tl(int savedErrno);
 #define LOG Logger(__FILE__, __LINE__).stream()

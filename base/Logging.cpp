@@ -12,6 +12,12 @@ static pthread_once_t once_control_ = PTHREAD_ONCE_INIT;
 static AsyncLogging *AsyncLogger_;
 
 std::string Logger::logFileName_ = "./WebServer.log";
+__thread char t_errnobuf[512];
+
+const char* strerror_tl(int savedErrno)
+{
+  return strerror_r(savedErrno, t_errnobuf, sizeof t_errnobuf);
+}
 
 void once_init()
 {
