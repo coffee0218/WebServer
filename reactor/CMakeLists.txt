@@ -1,5 +1,6 @@
 set(LIB_SRC
     Acceptor.cpp
+    Buffer.cpp
     Channel.cpp
     EventLoop.cpp
     EventLoopThread.cpp

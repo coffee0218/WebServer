@@ -2,10 +2,7 @@
 #include "../../reactor/EventLoop.h"
 #include "../../reactor/InetAddress.h"
 #include <stdio.h>
-/*
-*本test的TcpConnection只处理了建立连接，它实际上是个diacard服务。但目前它永远
-*不会关闭socket，即onConnection不会走到else分支
-*/
+
 void onConnection(const TcpConnectionPtr& conn)
 {
   if (conn->connected())
@@ -22,11 +19,15 @@ void onConnection(const TcpConnectionPtr& conn)
 }
 
 void onMessage(const TcpConnectionPtr& conn,
-               const char* data,
-               ssize_t len)
+               Buffer* buf,
+               Timestamp receiveTime)
 {
-  printf("onMessage(): received %zd bytes from connection [%s]\n",
-         len, conn->name().c_str());
+  printf("onMessage(): received %zd bytes from connection [%s] at %s\n",
+         buf->readableBytes(),
+         conn->name().c_str(),
+         receiveTime.toFormattedString().c_str());
+
+  printf("onMessage(): [%s]\n", buf->retrieveAsString().c_str());
 }
 
 int main()

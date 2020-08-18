@@ -32,7 +32,7 @@ void Channel::update()
 }
 
 //channel核心，它由EventLoop::loop()调用，它的功能是根据revents_的值分别调用不同的用户回调
-void Channel::handleEvent()
+void Channel::handleEvent(Timestamp receiveTime)
 {
   eventHandling_ = true;
   if (revents_ & POLLNVAL) {
@@ -47,7 +47,7 @@ void Channel::handleEvent()
     if (errorCallback_) errorCallback_();
   }
   if (revents_ & (POLLIN | POLLPRI | POLLRDHUP)) {
-    if (readCallback_) readCallback_();
+    if (readCallback_) readCallback_(receiveTime);
   }
   if (revents_ & POLLOUT) {
     if (writeCallback_) writeCallback_();

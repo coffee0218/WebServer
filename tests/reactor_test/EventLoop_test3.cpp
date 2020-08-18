@@ -9,14 +9,15 @@ EventLoop* g_loop;
 /*用timerfd实现了一个单次触发的定时器
 *这个程序利用channel将timerfd的readable事件转发给timeout()函数
 */
-void timeout()
+void timeout(Timestamp receiveTime)
 {
-  printf("Timeout!\n");
+  printf("%s Timeout!\n", receiveTime.toFormattedString().c_str());
   g_loop->quit();
 }
 
 int main()
 {
+  printf("%s started\n", Timestamp::now().toFormattedString().c_str());
   EventLoop loop;
   g_loop = &loop;
 

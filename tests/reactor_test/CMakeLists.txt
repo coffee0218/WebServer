@@ -22,7 +22,4 @@ target_link_libraries(Acceptor_test libserver_reactor)
 add_executable(TcpConnection_test1 TcpConnection_test1.cpp)
 target_link_libraries(TcpConnection_test1 libserver_reactor)
 
-add_executable(TcpConnection_test2 TcpConnection_test2.cpp)
-target_link_libraries(TcpConnection_test2 libserver_reactor)
-
 set (EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/build/bin)

@@ -3,6 +3,8 @@
 #include <boost/function.hpp>
 #include <boost/noncopyable.hpp>
 
+#include "../base/Timestamp.h"
+
 class EventLoop;
 
 /// A selectable I/O channel.
@@ -14,12 +16,13 @@ class Channel : boost::noncopyable
 {
  public:
   typedef boost::function<void()> EventCallback;//回调函数类型
+  typedef boost::function<void(Timestamp)> ReadEventCallback;
 
   Channel(EventLoop* loop, int fd);
   ~Channel();
 
-  void handleEvent();
-  void setReadCallback(const EventCallback& cb)//设置读写错误回调函数
+  void handleEvent(Timestamp receiveTime);
+  void setReadCallback(const ReadEventCallback& cb)//设置读写错误回调函数
   { readCallback_ = cb; }
   void setWriteCallback(const EventCallback& cb)
   { writeCallback_ = cb; }
@@ -59,7 +62,7 @@ class Channel : boost::noncopyable
 
   bool eventHandling_;
 
-  EventCallback readCallback_;
+  ReadEventCallback readCallback_;
   EventCallback writeCallback_;
   EventCallback errorCallback_;
   EventCallback closeCallback_;
