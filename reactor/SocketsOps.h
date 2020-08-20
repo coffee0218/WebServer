@@ -45,6 +45,7 @@ namespace sockets
   void listenOrDie(int sockfd);
   int  accept(int sockfd, struct sockaddr_in* addr);
   void close(int sockfd);
+  void shutdownWrite(int sockfd);
 
   void toHostPort(char* buf, size_t size,
                   const struct sockaddr_in& addr);

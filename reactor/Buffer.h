@@ -21,8 +21,8 @@
 class Buffer : public copyable
 {
  public:
-  static const size_t kCheapPrepend = 8;
-  static const size_t kInitialSize = 1024;
+  static const size_t kCheapPrepend = 8;//初始化prepend为8个字节大小
+  static const size_t kInitialSize = 1024;//初始化Buffer大小为1024字节 默认
 
   Buffer()
     : buffer_(kCheapPrepend + kInitialSize),
@@ -43,22 +43,22 @@ class Buffer : public copyable
     std::swap(writerIndex_, rhs.writerIndex_);
   }
 
-  size_t readableBytes() const
+  size_t readableBytes() const//计算可读
   { return writerIndex_ - readerIndex_; }
 
-  size_t writableBytes() const
+  size_t writableBytes() const//计算可写
   { return buffer_.size() - writerIndex_; }
 
   size_t prependableBytes() const
   { return readerIndex_; }
 
-  const char* peek() const
+  const char* peek() const//用来返回数据内容的起始位置
   { return begin() + readerIndex_; }
 
   // retrieve returns void, to prevent
   // string str(retrieve(readableBytes()), readableBytes());
   // the evaluation of two functions are unspecified
-  void retrieve(size_t len)
+  void retrieve(size_t len)//该函数用来回收Buffer空间，在读取Buffer的内容后,调用此函数来挪动索引
   {
     assert(len <= readableBytes());
     readerIndex_ += len;
@@ -71,13 +71,13 @@ class Buffer : public copyable
     retrieve(end - peek());
   }
 
-  void retrieveAll()
+  void retrieveAll()//回收所有Buffer，将两个索引回归到初始位置
   {
     readerIndex_ = kCheapPrepend;
     writerIndex_ = kCheapPrepend;
   }
 
-  std::string retrieveAsString()
+  std::string retrieveAsString()//读取buffer所有的内容
   {
     std::string str(peek(), readableBytes());
     retrieveAll();
@@ -89,9 +89,9 @@ class Buffer : public copyable
     append(str.data(), str.length());
   }
 
-  void append(const char* /*restrict*/ data, size_t len)
+  void append(const char* /*restrict*/ data, size_t len)//写入数据
   {
-    ensureWritableBytes(len);
+    ensureWritableBytes(len);//保证Buffer有足够空间可写
     std::copy(data, data+len, beginWrite());
     hasWritten(len);
   }
@@ -101,7 +101,7 @@ class Buffer : public copyable
     append(static_cast<const char*>(data), len);
   }
 
-  void ensureWritableBytes(size_t len)
+  void ensureWritableBytes(size_t len)//对buffer进行扩容
   {
     if (writableBytes() < len)
     {
@@ -148,11 +148,11 @@ class Buffer : public copyable
   const char* begin() const
   { return &*buffer_.begin(); }
 
-  void makeSpace(size_t len)
+  void makeSpace(size_t len)//进行内部腾挪
   {
     if (writableBytes() + prependableBytes() < len + kCheapPrepend)
     {
-      buffer_.resize(writerIndex_+len);
+      buffer_.resize(writerIndex_+len);//resize，这个时候内存不够了
     }
     else
     {
@@ -169,8 +169,8 @@ class Buffer : public copyable
   }
 
  private:
-  std::vector<char> buffer_;
-  size_t readerIndex_;
+  std::vector<char> buffer_;//底层存储
+  size_t readerIndex_;//读写索引
   size_t writerIndex_;
 };
 

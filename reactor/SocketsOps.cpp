@@ -112,6 +112,14 @@ void sockets::close(int sockfd)
   }
 }
 
+void sockets::shutdownWrite(int sockfd)
+{
+  if (::shutdown(sockfd, SHUT_WR) < 0)
+  {
+    LOG << "system error: sockets::shutdownWrite";
+  }
+}
+
 //网络字节序转换成主机字节序
 void sockets::toHostPort(char* buf, size_t size,
                          const struct sockaddr_in& addr)
