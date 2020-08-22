@@ -74,7 +74,12 @@ void TcpConnection::sendInLoop(const std::string& message)
       if (static_cast<size_t>(nwrote) < message.size()) {
         LOG<< "trace: I am going to write more data";
       }
-    } else {
+    }  
+    else if (writeCompleteCallback_) {
+        loop_->queueInLoop(
+            boost::bind(writeCompleteCallback_, shared_from_this()));
+    }
+    else {
       nwrote = 0;
       if (errno != EWOULDBLOCK) {//EWOULDBLOCK用于非阻塞模式，不需要重新读或者写, EWOULDBLOCK = EAGAIN
         LOG<< "system error: TcpConnection::sendInLoop";
@@ -110,6 +115,11 @@ void TcpConnection::shutdownInLoop()
     // we are not writing
     socket_->shutdownWrite();
   }
+}
+
+void TcpConnection::setTcpNoDelay(bool on)
+{
+  socket_->setTcpNoDelay(on);
 }
 
 void TcpConnection::connectEstablished()
@@ -167,6 +177,10 @@ void TcpConnection::handleWrite()
       if (outputBuffer_.readableBytes() == 0) 
       {
         channel_->disableWriting();
+        if (writeCompleteCallback_) {
+          loop_->queueInLoop(
+              boost::bind(writeCompleteCallback_, shared_from_this()));
+        }
         if (state_ == kDisconnecting) 
         {
           shutdownInLoop();

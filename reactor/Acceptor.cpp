@@ -6,6 +6,9 @@
 #include "SocketsOps.h"
 
 #include <boost/bind.hpp>
+#include <errno.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 using namespace std;
 
@@ -13,12 +16,19 @@ Acceptor::Acceptor(EventLoop* loop, const InetAddress& listenAddr)
   : loop_(loop),
     acceptSocket_(sockets::createNonblockingOrDie()),//创建非阻塞的连接socket
     acceptChannel_(loop, acceptSocket_.fd()),
-    listenning_(false)
+    listenning_(false),
+    idleFd_(::open("/dev/null", O_RDONLY | O_CLOEXEC))
 {
+  assert(idleFd_ >= 0);
   acceptSocket_.setReuseAddr(true);//设置端口复用
   acceptSocket_.bindAddress(listenAddr);//绑定
   acceptChannel_.setReadCallback(
       boost::bind(&Acceptor::handleRead, this));
+}
+
+Acceptor::~Acceptor()
+{
+  ::close(idleFd_);
 }
 
 void Acceptor::listen()//监听
@@ -43,6 +53,20 @@ void Acceptor::handleRead()
       newConnectionCallback_(connfd, peerAddr);
     } else {
       sockets::close(connfd);
+    }
+  }
+  else
+  {
+    LOG<< "system error: in Acceptor::handleRead";
+    /*限制并发连接数，准备一个空闲的文件描述符。遇到文件描述符达到上限的情况，先关闭这个空闲文件，获得一个文件描述符的名额；
+    *再accept拿到新socket连接的描述符，随后立即close它，这样就优雅地断开了客户端连接；最后重新打开一个空闲文件，把坑站占住。
+    */
+    if (errno == EMFILE)
+    {
+      ::close(idleFd_);
+      idleFd_ = ::accept(acceptSocket_.fd(), NULL, NULL);
+      ::close(idleFd_);
+      idleFd_ = ::open("/dev/null", O_RDONLY | O_CLOEXEC);
     }
   }
 }

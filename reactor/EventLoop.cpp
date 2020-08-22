@@ -4,6 +4,7 @@
 #include "EventLoop.h"
 #include <sys/eventfd.h>
 #include <boost/bind.hpp>
+#include <signal.h>
 
 using namespace std;
 
@@ -27,6 +28,17 @@ static int createEventfd()
   }
   return evtfd;
 }
+
+class IgnoreSigPipe
+{
+ public:
+  IgnoreSigPipe()
+  {
+    ::signal(SIGPIPE, SIG_IGN);
+  }
+};
+
+IgnoreSigPipe initObj;
 
 EventLoop::EventLoop()
   : looping_(false),

@@ -64,6 +64,7 @@ void TcpServer::newConnection(int sockfd, const InetAddress& peerAddr)
   connections_[connName] = conn;//每个TcpConnection对象有一个名字，这个名字是由其所属的TcpServer在创建TcpConnection对象时生成，名字是ConnectionMap的key。
   conn->setConnectionCallback(connectionCallback_);
   conn->setMessageCallback(messageCallback_);
+  conn->setWriteCompleteCallback(writeCompleteCallback_);
   conn->setCloseCallback(
       boost::bind(&TcpServer::removeConnection, this, _1));//TcpServer向TcpConnection注册CloseCallback，用于接收连接断开的消息
   conn->connectEstablished();

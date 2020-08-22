@@ -19,6 +19,7 @@ class Acceptor : boost::noncopyable
                                 const InetAddress&)> NewConnectionCallback;
 
   Acceptor(EventLoop* loop, const InetAddress& listenAddr);
+  ~Acceptor();
 
   void setNewConnectionCallback(const NewConnectionCallback& cb)
   { newConnectionCallback_ = cb; }
@@ -34,5 +35,6 @@ class Acceptor : boost::noncopyable
   Channel acceptChannel_;
   NewConnectionCallback newConnectionCallback_;//用户的回调函数
   bool listenning_;
+  int idleFd_;
 };
 
