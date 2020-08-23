@@ -10,11 +10,14 @@ void onConnection(const TcpConnectionPtr& conn)
 {
   if (conn->connected())
   {
-    printf("onConnection(): new connection [%s] from %s\n",
+    printf("onConnection(): tid=%d new connection [%s] from %s\n",
+           CurrentThread::tid(),
            conn->name().c_str(),
            conn->peerAddress().toHostPort().c_str());
-    conn->send(message1);
-    conn->send(message2);
+    if (!message1.empty())
+      conn->send(message1);
+    if (!message2.empty())
+      conn->send(message2);
     conn->shutdown();
   }
   else
@@ -28,7 +31,8 @@ void onMessage(const TcpConnectionPtr& conn,
                Buffer* buf,
                Timestamp receiveTime)
 {
-  printf("onMessage(): received %zd bytes from connection [%s] at %s\n",
+  printf("onMessage(): tid=%d received %zd bytes from connection [%s] at %s\n",
+         CurrentThread::tid(),
          buf->readableBytes(),
          conn->name().c_str(),
          receiveTime.toFormattedString().c_str());
@@ -60,6 +64,9 @@ int main(int argc, char* argv[])
   TcpServer server(&loop, listenAddr);
   server.setConnectionCallback(onConnection);
   server.setMessageCallback(onMessage);
+  if (argc > 3) {
+    server.setThreadNum(atoi(argv[3]));
+  }
   server.start();
 
   loop.loop();

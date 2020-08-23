@@ -4,6 +4,7 @@ set(LIB_SRC
     Channel.cpp
     EventLoop.cpp
     EventLoopThread.cpp
+    EventLoopThreadPool.cpp
     InetAddress.cpp
     Poller.cpp
     Socket.cpp
