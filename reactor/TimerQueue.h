@@ -29,15 +29,19 @@ class TimerQueue : boost::noncopyable
                    Timestamp when,
                    double interval);
 
-  // void cancel(TimerId timerId);
+  void cancel(TimerId timerId);
 
  private:
 
   // FIXME: use unique_ptr<Timer> instead of raw pointers.
   typedef std::pair<Timestamp, Timer*> Entry;
   typedef std::set<Entry> TimerList;//TimerList是set而非map，因为只有key没有value
+  typedef std::pair<Timer*, int64_t> ActiveTimer;
+  typedef std::set<ActiveTimer> ActiveTimerSet;
 
   void addTimerInLoop(Timer* timer);
+  void cancelInLoop(TimerId timerId);
+
   void handleRead();// 定时器到期，timerfd_上有可读事件事件时被调用
   
   std::vector<Entry> getExpired(Timestamp now);// move out all expired timers
@@ -50,6 +54,11 @@ class TimerQueue : boost::noncopyable
   Channel timerfdChannel_;
   // Timer list sorted by expiration
   TimerList timers_;
+
+  // for cancel()
+  bool callingExpiredTimers_; /* atomic */
+  ActiveTimerSet activeTimers_;
+  ActiveTimerSet cancelingTimers_;
 };
 
 /*TimerQueue需要高效地组织目前尚未到期的Timer，能快速根据当前时间找到已经到期的Timer，也能高效地添加和删除Timer。

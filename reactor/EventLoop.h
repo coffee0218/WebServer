@@ -45,6 +45,8 @@ class EventLoop : boost::noncopyable
   /// Runs callback every interval seconds.
   TimerId runEvery(double interval, const TimerCallback& cb);
 
+  void cancel(TimerId timerId);
+
   // internal use only
   void wakeup();
   void updateChannel(Channel* channel);

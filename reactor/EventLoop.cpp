@@ -90,6 +90,11 @@ TimerId EventLoop::runEvery(double interval, const TimerCallback& cb)
   return timerQueue_->addTimer(cb, time, interval);
 }
 
+void EventLoop::cancel(TimerId timerId)
+{
+  return timerQueue_->cancel(timerId);
+}
+
 //调用IO复用poll()获取当前活动事件的channel列表，然后依次调用每个channel的handleEvent()函数
 void EventLoop::loop()
 {
