@@ -11,6 +11,7 @@ set(LIB_SRC
     Socket.cpp
     SocketsOps.cpp
     TcpConnection.cpp
+    TcpClient.cpp
     TcpServer.cpp
     Timer.cpp
     TimerQueue.cpp
