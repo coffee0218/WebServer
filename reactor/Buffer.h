@@ -76,7 +76,7 @@ class Buffer : public copyable
     readerIndex_ = kCheapPrepend;
     writerIndex_ = kCheapPrepend;
   }
-
+  
   std::string retrieveAsString()//读取buffer所有的内容
   {
     std::string str(peek(), readableBytes());

@@ -41,6 +41,7 @@ class TcpConnection : boost::noncopyable,
   //void send(const void* message, size_t len);
   // Thread safe.
   void send(const std::string& message);
+  void send(Buffer* message);  // this one will swap data
   // Thread safe.
   void shutdown();
   void setTcpNoDelay(bool on);

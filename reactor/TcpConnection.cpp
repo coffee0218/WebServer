@@ -58,6 +58,22 @@ void TcpConnection::send(const std::string& message)
   }
 }
 
+void TcpConnection::send(Buffer* buf)
+{
+  if (state_ == kConnected)
+  {
+    if (loop_->isInLoopThread())
+    {
+      sendInLoop(buf->retrieveAsString());
+    }
+    else
+    {
+      loop_->runInLoop(
+          boost::bind(&TcpConnection::sendInLoop, this, buf->retrieveAsString()));
+    }
+  }
+}
+
 /*
 *sendInLoop会先尝试直接发送数据，如果一次发送完毕就不会启用WriteCallback。
 *如果只发送了部分数据，则把剩余的数据放入outputBuffer_, 并开始关注writable事件，
