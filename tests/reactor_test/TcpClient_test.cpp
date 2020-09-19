@@ -38,7 +38,7 @@ void onMessage(const TcpConnectionPtr& conn,
          conn->name().c_str(),
          receiveTime.toFormattedString().c_str());
 
-  printf("onMessage(): [%s]\n", buf->retrieveAsString().c_str());
+  printf("onMessage(): [%s]\n", buf->retrieveAllAsString().c_str());
 }
 
 int main()

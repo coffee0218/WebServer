@@ -64,12 +64,12 @@ void TcpConnection::send(Buffer* buf)
   {
     if (loop_->isInLoopThread())
     {
-      sendInLoop(buf->retrieveAsString());
+      sendInLoop(buf->retrieveAllAsString());
     }
     else
     {
       loop_->runInLoop(
-          boost::bind(&TcpConnection::sendInLoop, this, buf->retrieveAsString()));
+          boost::bind(&TcpConnection::sendInLoop, this, buf->retrieveAllAsString()));
     }
   }
 }
