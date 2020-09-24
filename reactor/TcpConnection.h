@@ -46,6 +46,12 @@ class TcpConnection : boost::noncopyable,
   void shutdown();
   void setTcpNoDelay(bool on);
 
+  void setContext(const boost::any& context)
+  { context_ = context; }
+
+  const boost::any& getContext() const
+  { return context_; }
+
   void setConnectionCallback(const ConnectionCallback& cb)
   { connectionCallback_ = cb; }
 
@@ -89,6 +95,7 @@ class TcpConnection : boost::noncopyable,
   CloseCallback closeCallback_;
   Buffer inputBuffer_;
   Buffer outputBuffer_;
+  boost::any context_;
 };
 
 typedef boost::shared_ptr<TcpConnection> TcpConnectionPtr;

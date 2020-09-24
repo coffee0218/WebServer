@@ -28,9 +28,10 @@ void EchoServer::onConnection(const TcpConnectionPtr& conn)
   LOG << "EchoServer - " << conn->peerAddress().toHostPort() << " -> "
            << conn->localAddress().toHostPort() << " is "
            << (conn->connected() ? "UP" : "DOWN");
-  printf("EchoServer: new connection [%s] peer is %s\n",
+  printf("EchoServer: new connection [%s] peer is %s %s\n",
            conn->name().c_str(),
-           conn->peerAddress().toHostPort().c_str());
+           conn->peerAddress().toHostPort().c_str(),
+           conn->connected() ? "UP" : "DOWN");
 
   if (conn->connected())
   {
