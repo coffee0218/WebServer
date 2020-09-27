@@ -4,6 +4,7 @@
 #include <boost/scoped_ptr.hpp>
 #include <vector>
 #include "Channel.h"
+#include "EPoller.h"
 #include "Poller.h"
 #include "Callbacks.h"
 #include "TimerId.h"
@@ -75,7 +76,7 @@ class EventLoop : boost::noncopyable
   bool callingPendingFunctors_; /* atomic */
   const pid_t threadId_;
   Timestamp pollReturnTime_;
-  boost::scoped_ptr<Poller> poller_;//通过scoped_ptr来间接持有poller
+  boost::scoped_ptr<EPoller> poller_;//通过scoped_ptr来间接持有poller
   boost::scoped_ptr<TimerQueue> timerQueue_;
   int wakeupFd_;
   // unlike in TimerQueue, which is an internal class,

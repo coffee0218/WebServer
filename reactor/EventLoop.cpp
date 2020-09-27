@@ -45,7 +45,7 @@ EventLoop::EventLoop()
     quit_(false),
     callingPendingFunctors_(false),
     threadId_(CurrentThread::tid()),
-    poller_(new Poller(this)),
+    poller_(new EPoller(this)),
     timerQueue_(new TimerQueue(this)),
     wakeupFd_(createEventfd()),
     wakeupChannel_(new Channel(this, wakeupFd_))
@@ -185,6 +185,7 @@ void EventLoop::abortNotInLoopThread()
   LOG << "fatal error: EventLoop::abortNotInLoopThread"
             << " was created in threadId_ = " << threadId_
             << ", current thread id = " <<  CurrentThread::tid();
+  abort();
 }
 
 void EventLoop::wakeup()
