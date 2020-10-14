@@ -25,6 +25,9 @@ class TcpServer : boost::noncopyable
   TcpServer(EventLoop* loop, const InetAddress& listenAddr);
   ~TcpServer();  // force out-line dtor, for scoped_ptr members.
 
+  EventLoop* getLoop() const { return loop_; }
+  const string& name() const { return name_; }
+
   /// Set the number of threads for handling input.
   ///
   /// Always accepts new connection in loop's thread.

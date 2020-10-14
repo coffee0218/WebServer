@@ -55,6 +55,13 @@ class Buffer : public copyable
   const char* peek() const//用来返回数据内容的起始位置
   { return begin() + readerIndex_; }
 
+  const char* findCRLF() const
+  {
+    // FIXME: replace with memmem()?
+    const char* crlf = std::search(peek(), beginWrite(), kCRLF, kCRLF+2);
+    return crlf == beginWrite() ? NULL : crlf;
+  }
+
   // retrieve returns void, to prevent
   // string str(retrieve(readableBytes()), readableBytes());
   // the evaluation of two functions are unspecified
@@ -172,5 +179,6 @@ class Buffer : public copyable
   std::vector<char> buffer_;//底层存储
   size_t readerIndex_;//读写索引
   size_t writerIndex_;
+  static const char kCRLF[];
 };
 
