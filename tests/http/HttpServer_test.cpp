@@ -14,7 +14,7 @@ bool benchmark = false;
 
 void onRequest(const HttpRequest& req, HttpResponse* resp)
 {
-  std::cout << "Headers " << req.methodString() << " " << req.path() << std::endl;
+  /*std::cout << "Headers " << req.methodString() << " " << req.path() << std::endl;
   if (!benchmark)
   {
     const std::map<string, string>& headers = req.headers();
@@ -22,7 +22,7 @@ void onRequest(const HttpRequest& req, HttpResponse* resp)
     {
       std::cout << header.first << ": " << header.second << std::endl;
     }
-  }
+  }*/
 
   if (req.path() == "/")
   {

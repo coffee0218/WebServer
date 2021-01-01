@@ -3,9 +3,6 @@
 #include "../../reactor/Buffer.h"
 
 #include <stdio.h>
-#include <string>
-
-using namespace std;
 
 void HttpResponse::appendToBuffer(Buffer* output) const
 {

@@ -43,7 +43,7 @@ TcpConnection::~TcpConnection()
 {
   LOG << "TcpConnection::dtor[" <<  name_ << "] at "
             << " fd=" << channel_->fd();
-  printf("TcpConnection::~TcpConnection, TcpConnetion release");
+  //printf("TcpConnection::~TcpConnection, TcpConnetion release");
 }
 
 void TcpConnection::send(const std::string& message)
