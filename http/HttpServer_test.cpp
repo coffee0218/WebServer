@@ -1,8 +1,8 @@
 #include "HttpServer.h"
 #include "HttpRequest.h"
 #include "HttpResponse.h"
-#include "../../reactor/EventLoop.h"
-#include "../../base/Logging.h"
+#include "../reactor/EventLoop.h"
+#include "../base/Logging.h"
 
 #include <iostream>
 #include <map>
@@ -42,7 +42,7 @@ void onRequest(const HttpRequest& req, HttpResponse* resp)
     resp->setContentType("image/png");
     resp->setBody(string(favicon, sizeof favicon));
   }
-  else if (req.path
+  else if (req.path() == "/hello")
   {
     resp->setStatusCode(HttpResponse::k200Ok);
     resp->setStatusMessage("OK");

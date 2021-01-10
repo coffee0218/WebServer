@@ -1,6 +1,6 @@
 
 #include "HttpResponse.h"
-#include "../../reactor/Buffer.h"
+#include "../reactor/Buffer.h"
 
 #include <stdio.h>
 

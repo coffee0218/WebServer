@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../../base/copyable.h"
-#include "../../base/Timestamp.h"
+#include "../base/copyable.h"
+#include "../base/Timestamp.h"
 
 #include <map>
 #include <assert.h>

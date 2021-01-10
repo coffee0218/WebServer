@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../base/copyable.h"
+#include "../base/copyable.h"
 
 #include <map>
 #include <string>

@@ -1,6 +1,6 @@
 #include "HttpServer.h"
 #include <boost/bind.hpp>
-#include "../../base/Logging.h"
+#include "../base/Logging.h"
 #include "HttpContext.h"
 #include "HttpRequest.h"
 #include "HttpResponse.h"

@@ -10,6 +10,7 @@ include_directories(${PROJECT_SOURCE_DIR}/reactor)
 
 add_subdirectory (base)
 add_subdirectory (reactor)
+add_subdirectory (http)
 
 if (MYDEBUG)
     add_subdirectory(tests)
